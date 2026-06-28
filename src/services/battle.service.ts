@@ -3,7 +3,7 @@ import {StoreRegistry, stores} from "./store-registry";
 import * as battleGrpc from "../grpc/generated/battle";
 import * as engineGrpc from "../grpc/generated/engine";
 import {BattleStateStore} from "../stores/battleStateStore";
-import {enqueueEvent} from "@shared/pg-boss/src/enqueueEvent";
+import {enqueueEvent} from "@shared/pg-boss-helper/src/enqueueEvent";
 import logger from "@shared/logger";
 
 export function battleStore(): BattleStateStore {
