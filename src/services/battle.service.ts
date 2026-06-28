@@ -3,7 +3,8 @@ import {StoreRegistry, stores} from "./store-registry";
 import * as battleGrpc from "../grpc/generated/battle";
 import * as engineGrpc from "../grpc/generated/engine";
 import {BattleStateStore} from "../stores/battleStateStore";
-import {enqueueEvent} from "@shared/pg-boss-manager/src/enqueueEvent";
+import pgBossManager from "@shared/pg-boss-manager";
+
 import logger from "@shared/logger";
 
 export function battleStore(): BattleStateStore {
@@ -24,7 +25,7 @@ export const battleNew = async (battle: battleGrpc.BattleObject) => {
   battle.winner = "";
 
   await battleStore().set(battle);
-  await enqueueEvent(kafkaProducersConfig.topicBattleUpdated, battle);
+  await pgBossManager.enqueueEvent(kafkaProducersConfig.topicBattleUpdated, battle);
 
   return battle;
 
@@ -111,7 +112,7 @@ export const makeMove = async (move: engineGrpc.BattleMoveRequest) => {
     await battleStore().set(battle);
   }
 
-  await enqueueEvent(kafkaProducersConfig.topicBattleUpdated, battle);
+  await pgBossManager.enqueueEvent(kafkaProducersConfig.topicBattleUpdated, battle);
 
   return battle;
 };
@@ -135,7 +136,7 @@ export const leaveBattle = async (profileId: string, battleId: string) => {
 
   await battleStore().remove(battle.id);
 
-  await enqueueEvent(kafkaProducersConfig.topicBattleUpdated, battle);
+  await pgBossManager.enqueueEvent(kafkaProducersConfig.topicBattleUpdated, battle);
 
   return battle;
 
