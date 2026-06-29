@@ -9,6 +9,7 @@ COPY turbo.json ./
 COPY package.json ./
 COPY pnpm-workspace.yaml ./
 COPY tsconfig.json ./
+
 COPY services/engine/package*.json ./services/engine/
 COPY services/engine/jest.config.js ./services/engine/
 COPY services/engine/tsconfig.json ./services/engine/
@@ -40,8 +41,11 @@ FROM base AS prod
 ENV NODE_ENV=production
 
 USER root
-RUN corepack enable && pnpm install --frozen-lockfile --prod && pnpm run --filter engine build
-RUN chown -R node:node /usr/src/app
+RUN corepack enable \
+ && pnpm install --frozen-lockfile \
+ && pnpm run --filter engine build \
+ && pnpm prune --prod \
+ && chown -R node:node /usr/src/app
 
 USER node
 
