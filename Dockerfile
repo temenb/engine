@@ -12,6 +12,7 @@ COPY tsconfig.json ./
 COPY proto ./proto
 
 COPY services/engine/package*.json ./services/engine/
+COPY services/engine/prisma ./services/engine/prisma
 COPY services/engine/jest.config.js ./services/engine/
 COPY services/engine/tsconfig.json ./services/engine/
 COPY services/engine/prisma ./services/engine/prisma/
