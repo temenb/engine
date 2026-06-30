@@ -13,7 +13,7 @@ const battleManager = new GrpcClientManager<battleGrpc.BattleClient>(() => {
 
 export const health = (): Promise<healthGrpc.HealthReport | null> => {
   const grpcRequest: emptyGrpc.Empty = {};
-  return battleManager.call((client, cb) => client.health(grpcRequest, cb));
+  return battleManager.call<healthGrpc.HealthReport>((client, cb) => client.health(grpcRequest, cb));
 };
 
 export const status = (): Promise<healthGrpc.StatusInfo | null> => {

@@ -22,7 +22,7 @@ export async function battleChannel(
         }
 
         if (event.move) {
-logger.log('')
+          logger.log('')
 
           const battleMoveRequest = event.move as engineGrpc.BattleMoveRequest;
 
