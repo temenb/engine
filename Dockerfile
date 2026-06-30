@@ -12,12 +12,11 @@ COPY tsconfig.json ./
 COPY proto ./proto
 
 COPY services/engine/package*.json ./services/engine/
-COPY services/engine/prisma ./services/engine/prisma
 COPY services/engine/jest.config.js ./services/engine/
 COPY services/engine/tsconfig.json ./services/engine/
-COPY services/engine/prisma ./services/engine/prisma/
 COPY services/engine/src ./services/engine/src/
 COPY services/engine/__tests__ ./services/engine/__tests__/
+COPY services/engine/prisma ./services/engine/prisma/
 
 # ---------- BUILD ----------
 FROM base AS build
@@ -28,9 +27,14 @@ RUN apt-get update && apt-get install -y protobuf-compiler
 
 RUN corepack enable
 RUN pnpm install --frozen-lockfile
+RUN mkdir ./services/engine/src/grpc/generated -p
 RUN pnpm run --filter engine proto:generate
-RUN pnpm run --filter engine build
-RUN pnpm install --prod
+RUN pnpm --filter @shared/logger build
+RUN pnpm --filter @shared/grpc-client-manager build
+RUN pnpm --filter @shared/kafka-manager build
+RUN pnpm --filter @shared/pg-boss-manager buld
+RUN pnpm --filter engine build
+RUN pnpm prune --prod
 
 # ---------- DEV ----------
 FROM build AS dev
@@ -44,7 +48,7 @@ EXPOSE 50051
 CMD ["pnpm", "--filter", "engine", "start"]
 
 HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
-  CMD nc -z localhost 50051 || exit 1
+  CMD curl -f http://localhost:9090/livez || exit 1
 
 # ---------- PROD ----------
 FROM node:22 AS prod
@@ -69,5 +73,5 @@ EXPOSE 50051
 
 CMD ["node", "./services/engine/dist/app.js"]
 
-HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
-  CMD nc -z localhost 50051 || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:9090/livez || exit 1
