@@ -80,7 +80,6 @@ WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
 
-COPY --from=build /usr/src/app/services/engine/prisma ./services/engine/prisma
 COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/services/engine/node_modules ./services/engine/node_modules
 COPY --from=build /usr/src/app/services/engine/dist ./services/engine/dist
